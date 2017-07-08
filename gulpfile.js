@@ -6,15 +6,21 @@ const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const cleanCSS = require('gulp-clean-css');
 const htmlmin = require('gulp-htmlmin');
+const changed = require('gulp-changed');
 const browserSync = require('browser-sync');
 const reload = browserSync.reload;
+const del = require('del');
+const rename = require('gulp-rename');
+const imagemin = require('gulp-imagemin');
+
 gulp.task('clean', function(cb) {
   // You can use multiple globbing patterns as you would with `gulp.src`
-  del(['dest'], cb);
+  return del(['dist','.generated'], cb);
 });
 //sass, destination 
-gulp.task('sass', function () {
+gulp.task('sass',['clean'], function () {
  return gulp.src('./app/assets/sass/**/*.scss')
+  .pipe(changed('./.generated/scss'))
   .pipe(sourcemaps.init())
   .pipe(sass().on('error', sass.logError))
   .pipe(sourcemaps.write())
@@ -22,29 +28,38 @@ gulp.task('sass', function () {
  
 });
 //concat all javascript files
-gulp.task('js', function() {
+gulp.task('js',['clean'], function() {
    gulp.src('app/assets/js/*.js')
    .pipe(concat('script.js'))
    .pipe(uglify())
+   .pipe(rename({suffix:'.min', extname:'.js'}))
    .pipe(gulp.dest('./dist/assets/js/'));
 });
-
-gulp.task('css', ['sass'],function(){
+//css task, 
+gulp.task('css', ['clean','sass'],function(){
    gulp.src(['.generated/scss/*.css','app/assets/css/*.css'])
+   .pipe(changed('./dist/assets/css'))
+   .pipe(concat('main.bundle.css'))
    .pipe(autoprefixer())
    .pipe(cleanCSS())
+   .pipe(rename({suffix:'.min', extname:'.css'}))
    .pipe(gulp.dest('./dist/assets/css'))
    .pipe(browserSync.stream({match: '**/*.css'}));
 });
  
-
-gulp.task('html', function(){
+gulp.task('images', ['clean'], function() {
+    gulp.src('app/assets/iamges/**/*')
+    .pipe(imagemin())
+    .pipe(gulp.dest('dist/assets/images'));
+});
+gulp.task('html', ['clean'],function(){
      gulp.src('app/**/*.html')
+     .pipe(changed('./dist'))
     .pipe(htmlmin({collapseWhitespace: true}))
     .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('build',['js', 'sass','css','html'],function(){
+gulp.task('build',['clean','js', 'sass','css','images','html'],function(){
     console.log('What can I say... You\'re Welcome!');
 });
 gulp.task('browserSync', function() {
@@ -52,8 +67,11 @@ gulp.task('browserSync', function() {
     server:  ['app','dist']
   });
 })
+
 // watch files for changes and reload
-gulp.task('serve',['css','js','browserSync', 'watch'], function() {});
+gulp.task('serve',['clean','css','js', 'browserSync', 'watch'], function() {
+      //gutil.log('Server started on port', gutil.colors.magenta('8000'));
+});
 
 gulp.task('watch', function() {
     gulp.watch('./app/assets/sass/**/*.scss', ['css']);
