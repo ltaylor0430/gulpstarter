@@ -12,13 +12,13 @@ const reload = browserSync.reload;
 const del = require('del');
 const rename = require('gulp-rename');
 const imagemin = require('gulp-imagemin');
-
+const flatten = require('gulp-flatten');
 //install components with bower then add them here to be bundle
 const VENDORS = [
   'components/lib/jquery/dist/jquery.js',
   'components/lib/bootstrap/dist/js/bootstrap.js'];
 const STYLES = [
-  'components/bootstrap/bootstrap.css'
+  'components/lib/bootstrap/dist/css/bootstrap.css'
 ]
 gulp.task('clean', function(cb) {
   // You can use multiple globbing patterns as you would with `gulp.src`
@@ -51,6 +51,7 @@ gulp.task('js',['clean'], function() {
    .pipe(rename({suffix:'.min', extname:'.js'}))
    .pipe(gulp.dest('./dist/assets/js/'));
 });
+
 //css task,
 gulp.task('css', ['clean','sass'],function(){
    gulp.src(STYLES.concat([
@@ -65,8 +66,21 @@ gulp.task('css', ['clean','sass'],function(){
    .pipe(browserSync.stream({match: '**/*.css'}));
 });
 
+//assets
+gulp.task('assets',['clean'],function() {
+gulp.src(['app/assets/**/*','!app/assets/js/**/*','!app/assets/images/**/*','!app/asset/scss/**/*'])
+.pipe(gulp.dest('./dist/assets'))
+});
+
+//bower fonts
+gulp.task('fonts',['clean'],function() {
+gulp.src('components/**/*.{otf,eot,svg,ttf,woff,woff2}')
+.pipe(flatten())
+.pipe(gulp.dest('./dist/assets/fonts'))
+});
+
 gulp.task('images', ['clean'], function() {
-    gulp.src('app/assets/iamges/**/*')
+    gulp.src('app/assets/images/**/*')
     .pipe(imagemin())
     .pipe(gulp.dest('dist/assets/images'));
 });
@@ -77,7 +91,7 @@ gulp.task('html', ['clean'],function(){
     .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('build',['clean', 'vendor','js', 'sass','css','images','html'],function(){
+gulp.task('build',['clean', 'vendor', 'fonts','js', 'sass','css','images', 'assets','html'],function(){
     console.log('What can I say... You\'re Welcome!');
 });
 gulp.task('browserSync', function() {
@@ -87,7 +101,7 @@ gulp.task('browserSync', function() {
 })
 
 // watch files for changes and reload
-gulp.task('serve',['clean','css', 'vendor','js', 'browserSync', 'watch'], function() {
+gulp.task('serve',['clean', 'vendor', 'fonts', 'js', 'css', 'browserSync', 'watch'], function() {
       //gutil.log('Server started on port', gutil.colors.magenta('8000'));
 });
 
