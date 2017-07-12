@@ -1,0 +1,22 @@
+{
+  "name": "gulp_starter",
+  "description": "Gulp starter project",
+  "main": "index.html",
+  "authors": [
+    "Lawrence Taylor"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/ltaylor0430/gulpstarter",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1"
+  }
+}

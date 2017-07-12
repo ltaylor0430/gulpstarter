@@ -4,6 +4,7 @@
   "description": "Gulp starter project ",
   "main": "index.html",
   "scripts": {
+    "install":"bower install",
     "start": "gulp serve",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,6 +12,7 @@
   "license": "ISC",
   "browserslist": "last 2 versions",
   "devDependencies": {
+    "bower": "^1.8.0",
     "browser-sync": "^2.18.12",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
