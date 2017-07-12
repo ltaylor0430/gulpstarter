@@ -17,7 +17,9 @@ const imagemin = require('gulp-imagemin');
 const VENDORS = [
   'components/lib/jquery/dist/jquery.js',
   'components/lib/bootstrap/dist/js/bootstrap.js'];
-
+const STYLES = [
+  'components/bootstrap/bootstrap.css'
+]
 gulp.task('clean', function(cb) {
   // You can use multiple globbing patterns as you would with `gulp.src`
   return del(['dist','.generated'], cb);
@@ -51,7 +53,9 @@ gulp.task('js',['clean'], function() {
 });
 //css task,
 gulp.task('css', ['clean','sass'],function(){
-   gulp.src(['.generated/scss/*.css','app/assets/css/*.css'])
+   gulp.src(STYLES.concat([
+     '.generated/scss/*.css',
+     'app/assets/css/*.css']))
    .pipe(changed('./dist/assets/css'))
    .pipe(concat('main.bundle.css'))
    .pipe(autoprefixer())
